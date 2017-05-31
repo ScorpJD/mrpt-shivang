@@ -104,6 +104,35 @@ namespace mrpt
 
 		}; // End of class
 		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectable3D, mrpt::detectors::CDetectable2D, DETECTORS_IMPEXP )
+
+		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectableMarker, mrpt::detectors::CDetectableObject, DETECTORS_IMPEXP )
+
+		class DETECTORS_IMPEXP CDetectableMarker: public CDetectableObject
+		{
+			DEFINE_SERIALIZABLE( CDetectableMarker )
+
+		public:
+			int m_id;
+
+			std::vector< std::pair<float, float> > corners;
+
+			CDetectableMarker();
+
+			CDetectableMarker(const std::vector< std::pair<float, float> > _corners, int id = -1):m_id(id)
+			{
+				for(auto it = _corners.begin(); it != _corners.end(); ++it)
+					corners.push_back(*it);
+			};
+
+			/** Copy pointer content constructor */
+			CDetectableMarker( const CDetectableMarker *d )
+			{
+				*this = *d;
+			};
+
+		}; // End of class
+		DEFINE_SERIALIZABLE_POST_CUSTOM_BASE_LINKAGE( CDetectableMarker, mrpt::detectors::CDetectableObject, DETECTORS_IMPEXP )
+
 	}
 
 }

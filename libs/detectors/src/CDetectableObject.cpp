@@ -19,7 +19,7 @@ using namespace mrpt::detectors;
 IMPLEMENTS_VIRTUAL_SERIALIZABLE(CDetectableObject, CSerializable, mrpt::detectors)
 IMPLEMENTS_SERIALIZABLE(CDetectable2D, CDetectableObject,mrpt::detectors)
 IMPLEMENTS_SERIALIZABLE(CDetectable3D, CDetectable2D,mrpt::detectors)
-
+IMPLEMENTS_SERIALIZABLE(CDetectableMarker, CDetectableObject,mrpt::detectors)
 
 void CDetectable2D::readFromStream(mrpt::utils::CStream &, int )
 {
@@ -39,5 +39,13 @@ void CDetectable3D::writeToStream(mrpt::utils::CStream &, int *) const
 
 CDetectable3D::CDetectable3D( const CDetectable2D::Ptr &object2d )
 	: CDetectable2D( object2d.get() ), m_z(0)
-{ 
+{
+}
+
+void CDetectableMarker::readFromStream(mrpt::utils::CStream &, int )
+{
+}
+
+void CDetectableMarker::writeToStream(mrpt::utils::CStream &, int *) const
+{
 }
