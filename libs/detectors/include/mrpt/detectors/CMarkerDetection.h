@@ -41,6 +41,7 @@ namespace mrpt
 				DETECTION_POLICY::detectMarkers(obs, detected);
 			}
 		};
+		typedef CMarkerDetection<CArucoDetectionPolicy> CArucoMarkerDetection;
 	}
 }
 
