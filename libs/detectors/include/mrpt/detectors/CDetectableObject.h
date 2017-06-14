@@ -116,7 +116,7 @@ namespace mrpt
 
 			std::vector< std::pair<float, float> > corners;
 
-			CDetectableMarker();
+			CDetectableMarker():m_id(-1){};
 
 			CDetectableMarker(const std::vector< std::pair<float, float> > _corners, int id = -1):m_id(id)
 			{
