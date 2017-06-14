@@ -2,6 +2,11 @@
 #define CMarkerDetection_H
 
 #include <mrpt/detectors/CObjectDetection.h>
+#include <mrpt/utils/CConfigFileBase.h>
+#include <mrpt/obs/CObservation.h>
+#include <mrpt/utils/pimpl.h>
+
+PIMPL_FORWARD_DECLARATION(namespace aruco { class MarkerDetector; })
 
 namespace mrpt
 {
@@ -21,8 +26,7 @@ namespace mrpt
 
 		protected:
 
-			void* m_marker_detector;
-			void* m_params;
+			PIMPL_DECLARE_TYPE(aruco::MarkerDetector, m_aruco_detector);
 			std::string m_tag_family;
 
 		}; // End of class
@@ -31,6 +35,7 @@ namespace mrpt
 		template <class DETECTION_POLICY>
 		class DETECTORS_IMPEXP CMarkerDetection: public DETECTION_POLICY, public CObjectDetection
 		{
+		public:
 			void init(const mrpt::utils::CConfigFileBase &cfg)
 			{
 				DETECTION_POLICY::init_params(cfg);
