@@ -1,5 +1,5 @@
 IF(CMAKE_MRPT_HAS_OPENCV)
-	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS} ${OPENCV_INCLUDEDIR})
+	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS} ${OPENCV_INCLUDEDIR} ${ARUCO_INCLUDE_DIRS})
 ENDIF()
 
 #---------------------------------------------
@@ -22,7 +22,7 @@ define_mrpt_lib(
 
 IF(BUILD_mrpt-detectors)
 	IF(CMAKE_MRPT_HAS_OPENCV)
-		target_link_libraries(mrpt-detectors ${OpenCV_LIBRARIES})
+		target_link_libraries(mrpt-detectors ${OpenCV_LIBRARIES} ${ARUCO_LIBRARIES})
 	ENDIF()
 
 ENDIF()
