@@ -292,6 +292,7 @@ IF(BUILD_EXAMPLES)
 		# === HWDRIVERS & DETECTORS ===
 		SET(LIST_EXAMPLES_IN_THIS_DIR
 			face_detection
+			markerTest
 			)
 		SET(CMAKE_EXAMPLE_DEPS mrpt-slam mrpt-hwdrivers mrpt-detectors)
 		SET(CMAKE_EXAMPLE_LINK_LIBS ${MRPT_LINKER_LIBS})
