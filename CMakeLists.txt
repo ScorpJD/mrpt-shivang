@@ -138,7 +138,6 @@ if (ENABLE_SOLUTION_FOLDERS)
   set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMakeTargets")
 endif ()
 
-
 # Build the ARIA library?
 SET(DEFAULT_BUILD_ARIA ON) # Default: Yes
 if (${CMAKE_MRPT_KERNEL} MATCHES "GNU")   # Unless in HURD
@@ -273,7 +272,7 @@ include(cmakemodules/script_yamlcpp.cmake REQUIRED)     # Check for YAMLCPP libr
 include(cmakemodules/script_pcap.cmake REQUIRED)        # Check for the libpcap library
 #include(cmakemodules/script_ros1.cmake REQUIRED)       # Check for ROS
 include(cmakemodules/script_vtk.cmake REQUIRED)         # Check for VTK
-
+include(cmakemodules/script_aruco.cmake REQUIRED)
 # ---------------------------------------------------------------------------
 #			OPTIONS
 #The options for the user when using "cmakesetup" or "ccmake":
