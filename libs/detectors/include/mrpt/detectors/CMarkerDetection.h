@@ -2,11 +2,12 @@
 #define CMarkerDetection_H
 
 #include <mrpt/detectors/CObjectDetection.h>
-#include <mrpt/utils/CConfigFileBase.h>
 #include <mrpt/obs/CObservation.h>
+#include <mrpt/utils/CConfigFileBase.h>
 #include <mrpt/utils/pimpl.h>
 
 PIMPL_FORWARD_DECLARATION(namespace aruco { class MarkerDetector; })
+PIMPL_FORWARD_DECLARATION(namespace aruco { class CameraParameters; })
 
 namespace mrpt
 {
@@ -27,7 +28,9 @@ namespace mrpt
 		protected:
 
 			PIMPL_DECLARE_TYPE(aruco::MarkerDetector, m_aruco_detector);
+			PIMPL_DECLARE_TYPE(aruco::CameraParameters, m_aruco_cam_param);
 			std::string m_tag_family;
+			float m_marker_size;
 
 		}; // End of class
 
