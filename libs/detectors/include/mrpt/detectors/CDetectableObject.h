@@ -12,6 +12,7 @@
 
 #include <mrpt/utils/CSerializable.h>
 #include <mrpt/obs/CObservation.h>
+#include <mrpt/poses/CPose3DRotVec.h>
 #define _USE_MATH_DEFINES // (For VS to define M_PI, etc. in cmath)
 #include <cmath>
 
@@ -113,16 +114,18 @@ namespace mrpt
 
 		public:
 			int m_id;
-
 			std::vector< std::pair<float, float> > corners;
+			mrpt::poses::CPose3DRotVec m_pose; //Relative pose between marker centre and camera frame
 
 			CDetectableMarker():m_id(-1){};
 
-			CDetectableMarker(const std::vector< std::pair<float, float> > _corners, int id = -1):m_id(id)
+			CDetectableMarker(const std::vector< std::pair<float, float> > _corners,
+							 int id = -1):m_id(id)
 			{
 				for(auto it = _corners.begin(); it != _corners.end(); ++it)
 					corners.push_back(*it);
 			};
+
 
 			/** Copy pointer content constructor */
 			CDetectableMarker( const CDetectableMarker *d )
