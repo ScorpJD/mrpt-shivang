@@ -67,18 +67,15 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 		cv::Size size;
 		for(int i = 0; i < 3; i++)
 		{
-			double* camMati = camMat.ptr<double>(i);
+			float* camMati = camMat.ptr<float>(i);
 			for(int j = 0; j < 3; j++)
 				camMati[j] = cameraParams->intrinsicParams(i, j);
 		}
-		double* distCoeffPtr = distCoeff.ptr<double>(0);
+		float* distCoeffPtr = distCoeff.ptr<float>(0);
 		for(int i = 0; i < 5; ++i)
 			distCoeffPtr[i] = cameraParams->dist(i);
 		size.height = cameraParams->nrows;
 		size.width = cameraParams->ncols;
-		cout << "camMat " << camMat << endl;
-		cout << "distCoeff " << distCoeff << endl;
-		cout << "size " << size << endl;
 		PIMPL_GET_REF(aruco::CameraParameters, m_aruco_cam_param).setParams(camMat, distCoeff, size);
 	}
 	// Convert to IplImage and copy it
@@ -92,15 +89,14 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 
 	for (unsigned int i = 0; i < markers.size(); i++)
 	{
-		cout << markers[i] << endl;
 		CDetectableMarker::Ptr markerObj = CDetectableMarker::Ptr(new CDetectableMarker);
 		markerObj->m_id = markers[i].id;
 		for (unsigned int j = 0; j < markers[i].size(); j++){
 			markerObj->corners.push_back(make_pair(markers[i][j].x, markers[i][j].y));
 		}
 		if(m_marker_size > 0 && PIMPL_GET_REF(aruco::CameraParameters, m_aruco_cam_param).isValid()){
-			double* TvecPtr = markers[i].Tvec.ptr<double>(0);
-			double* RvecPtr = markers[i].Rvec.ptr<double>(0);
+			float* TvecPtr = markers[i].Tvec.ptr<float>(0);
+			float* RvecPtr = markers[i].Rvec.ptr<float>(0);
 			for(int j = 0; j < 3; ++j){
 				markerObj->m_pose.m_coords(j) = TvecPtr[j];
 				markerObj->m_pose.m_rotvec(j) = RvecPtr[j];
