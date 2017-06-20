@@ -1,7 +1,9 @@
 IF(CMAKE_MRPT_HAS_OPENCV)
-	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS} ${OPENCV_INCLUDEDIR} ${ARUCO_INCLUDE_DIRS})
+	INCLUDE_DIRECTORIES(${OpenCV_INCLUDE_DIR} ${OpenCV_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIRS} ${OPENCV_INCLUDEDIR})
 ENDIF()
-
+IF(CMAKE_MRPT_HAS_ARUCO)
+	INCLUDE_DIRECTORIES(${ARUCO_INCLUDE_DIRS})
+ENDIF()
 #---------------------------------------------
 # Macro declared in "DeclareMRPTLib.cmake":
 #---------------------------------------------
@@ -22,7 +24,9 @@ define_mrpt_lib(
 
 IF(BUILD_mrpt-detectors)
 	IF(CMAKE_MRPT_HAS_OPENCV)
-		target_link_libraries(mrpt-detectors ${OpenCV_LIBRARIES} ${ARUCO_LIBRARIES})
+		target_link_libraries(mrpt-detectors ${OpenCV_LIBRARIES})
 	ENDIF()
-
+	IF(CMAKE_MRPT_HAS_ARUCO)
+		target_link_libraries(mrpt-detectors ${ARUCO_LIBRARIES})
+	ENDIF()
 ENDIF()

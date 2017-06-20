@@ -9,10 +9,11 @@
 // Universal include for all versions of OpenCV
 #include <mrpt/otherlibs/do_opencv_includes.h> 
 
+#if MRPT_HAS_ARUCO
 #include <aruco/aruco.h>
-
 PIMPL_IMPLEMENT(aruco::MarkerDetector);
 PIMPL_IMPLEMENT(aruco::CameraParameters);
+#endif
 
 using namespace mrpt::detectors;
 using namespace mrpt::obs;
@@ -25,6 +26,7 @@ using namespace cv;
 
 void CArucoDetectionPolicy::init_params(const mrpt::utils::CConfigFileBase &config)
 {
+	#if MRPT_HAS_ARUCO
 	PIMPL_CONSTRUCT(aruco::MarkerDetector, m_aruco_detector);
 	PIMPL_CONSTRUCT(aruco::CameraParameters, m_aruco_cam_param);
 	aruco::MarkerDetector::Params m_params ;
@@ -42,6 +44,7 @@ void CArucoDetectionPolicy::init_params(const mrpt::utils::CConfigFileBase &conf
 	m_marker_size = config.read_float("ArucoDetectionOptions","markerSize",-1);
 	PIMPL_GET_REF(aruco::MarkerDetector, m_aruco_detector).setParams(m_params);
 	PIMPL_GET_REF(aruco::MarkerDetector, m_aruco_detector).setDictionary(m_tag_family, 0.f);
+	#endif
 }
 
 void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, vector_detectable_object &detected)
@@ -61,6 +64,8 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 		// mrpt::system::sleep(2);
 		return;
 	}
+
+	#if MRPT_HAS_OPENCV && MRPT_OPENCV_VERSION_NUM>=0x200 && MRPT_HAS_ARUCO
 	if(!PIMPL_GET_REF(aruco::CameraParameters, m_aruco_cam_param).isValid()){
 		cv::Mat camMat(3, 3, CV_32F);
 		cv::Mat distCoeff(1, 5, CV_32F);
@@ -104,4 +109,5 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 		}
 		detected.push_back((CDetectableObject::Ptr)markerObj);
 	}
+	#endif
 }
