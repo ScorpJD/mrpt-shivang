@@ -34,10 +34,10 @@ void CArucoDetectionPolicy::init_params(const mrpt::utils::CConfigFileBase &conf
 	m_tag_family = config.read_string("ArucoDetectionOptions","tag_family","ARUCO");
 	m_params._thresParam1 = config.read_double("ArucoDetectionOptions","threshParam1",7);
 	m_params._thresParam2 = config.read_double("ArucoDetectionOptions","threshParam2",7);
-	m_params._thresParam1_range = config.read_double("ArucoDetectionOptions","threshParam1_range",0);
+	m_params._thresParam1_range = config.read_double("ArucoDetectionOptions","threshParam1_range",2);
 	m_params._subpix_wsize = config.read_int("ArucoDetectionOptions","subpix_wsize",4);
 	m_params._markerWarpSize = config.read_int("ArucoDetectionOptions","markerWarpSize",56);
-	m_params._borderDistThres = config.read_float("ArucoDetectionOptions","borderDistThres",0.05);
+	m_params._borderDistThres = config.read_float("ArucoDetectionOptions","borderDistThres",0.005);
 	m_params._minSize = config.read_float("ArucoDetectionOptions","minSize",0.04);
 	m_params._maxSize = config.read_float("ArucoDetectionOptions","maxSize",0.95);
 	m_params._minSize_pix = config.read_int("ArucoDetectionOptions","minSize_pix",25);
@@ -91,7 +91,6 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 												 m_aruco_detector).detect(matImage,
 												 PIMPL_GET_REF(aruco::CameraParameters, m_aruco_cam_param),
 												 m_marker_size);
-
 	for (unsigned int i = 0; i < markers.size(); i++)
 	{
 		CDetectableMarker::Ptr markerObj = CDetectableMarker::Ptr(new CDetectableMarker);
@@ -106,6 +105,7 @@ void CArucoDetectionPolicy::detectMarkers(const mrpt::obs::CObservation *obs, ve
 				markerObj->m_pose.m_coords(j) = TvecPtr[j];
 				markerObj->m_pose.m_rotvec(j) = RvecPtr[j];
 			}
+			markerObj->m_size = m_marker_size;
 		}
 		detected.push_back((CDetectableObject::Ptr)markerObj);
 	}

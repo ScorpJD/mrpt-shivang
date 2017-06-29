@@ -114,6 +114,7 @@ namespace mrpt
 
 		public:
 			int m_id;
+			float m_size;
 			std::vector< std::pair<float, float> > corners;
 			mrpt::poses::CPose3DRotVec m_pose; //Relative pose between marker centre and camera frame
 
