@@ -54,8 +54,7 @@ void addMarker(CDisplayWindow3D &win, const float markerSize, const vector_detec
 			// cout << camPose << endl;
 			// cout << camPose + CPose3D(marker->m_pose) << endl;
 		}
-		else
-			 cout << "Final " << marker->m_id << " " << camPose + CPose3D(marker->m_pose) << endl;
+		
 		// cout << "Inserted " << (marker->m_id) << " " << CPose3D(marker->m_pose) + camPose << endl;
 		COpenGLScene::Ptr &theScene = win.get3DSceneAndLock();
 		opengl::CGridPlaneXY::Ptr obj = opengl::CGridPlaneXY::Create(-1,1,-1,1,0,1, 0.4);
@@ -64,7 +63,7 @@ void addMarker(CDisplayWindow3D &win, const float markerSize, const vector_detec
 		obj->setScale(markerSize/2);
 		theScene->insert(obj);
 		win.unlockAccess3DScene();
-			// Update window:
+		// Update window:
 		win.forceRepaint();
 	}
 }
@@ -80,15 +79,64 @@ void addFrame(CDisplayWindow3D &win, CPose3D &pose)
 	win.forceRepaint();
 }
 
+void calcualte3DPoints(const CPose3D &pose, float markerSize, vector< mrpt::math::CArrayDouble<3> > &vec)
+{
+	mrpt::math::CMatrixDouble44 homogeneousMatrix;
+	mrpt::math::CArrayDouble<4> markerPoint;
+	mrpt::math::CArrayDouble<3> point3D;
+	mrpt::math::CArrayDouble<4> homog_point;
+	markerPoint[2] = 0;
+	markerPoint[3] = 1;
+
+	//Top right point
+	markerPoint[0] = markerSize/2;
+	markerPoint[1] = markerSize/2;
+	pose.getHomogeneousMatrix(homogeneousMatrix);
+	homog_point = homogeneousMatrix*markerPoint;
+	point3D(0) = homog_point(0)/homog_point(3);
+	point3D(1) = homog_point(1)/homog_point(3);
+	point3D(2) = homog_point(2)/homog_point(3);
+	vec.push_back(point3D);
+
+	//Top left point
+	markerPoint[0] = -1*markerSize/2;
+	markerPoint[1] = markerSize/2;
+	pose.getHomogeneousMatrix(homogeneousMatrix);
+	homog_point = homogeneousMatrix*markerPoint;
+	point3D(0) = homog_point(0)/homog_point(3);
+	point3D(1) = homog_point(1)/homog_point(3);
+	point3D(2) = homog_point(2)/homog_point(3);
+	vec.push_back(point3D);
+
+	//Bottom left point
+	markerPoint[0] = -1*markerSize/2;
+	markerPoint[1] = -1*markerSize/2;
+	pose.getHomogeneousMatrix(homogeneousMatrix);
+	homog_point = homogeneousMatrix*markerPoint;
+	point3D(0) = homog_point(0)/homog_point(3);
+	point3D(1) = homog_point(1)/homog_point(3);
+	point3D(2) = homog_point(2)/homog_point(3);
+	vec.push_back(point3D);
+
+	//Bottom right roint
+	markerPoint[0] = markerSize/2;
+	markerPoint[1] = -1*markerSize/2;
+	pose.getHomogeneousMatrix(homogeneousMatrix);
+	homog_point = homogeneousMatrix*markerPoint;
+	point3D(0) = homog_point(0)/homog_point(3);
+	point3D(1) = homog_point(1)/homog_point(3);
+	point3D(2) = homog_point(2)/homog_point(3);
+	vec.push_back(point3D);
+}
+
 bool getFramePose(const map<int, CPose3D> &markerMap, const vector_detectable_object &markers, CPose3D &camPose)
 {
-	Eigen::Vector3f mu_x = {0, 0, 0};
-	Eigen::Vector3f mu_y = {0, 0, 0};
-	Eigen::Matrix3f covar = Eigen::Matrix3f::Zero();;
+	Eigen::Vector3f mu_x = Eigen::Vector3f::Zero();
+	Eigen::Vector3f mu_y = Eigen::Vector3f::Zero();
+	Eigen::Matrix3f covar = Eigen::Matrix3f::Zero();
 	// cout << covar << endl;
 	vector< mrpt::math::CArrayDouble<3> > vecX;
 	vector< mrpt::math::CArrayDouble<3> > vecY;
-	int n = 0;
 	for ( unsigned int i = 0; i < markers.size(); i++ )
 	{
 		ASSERT_( IS_CLASS(markers[i],CDetectableMarker ) )
@@ -97,113 +145,13 @@ bool getFramePose(const map<int, CPose3D> &markerMap, const vector_detectable_ob
 		//cout << "Finding" << (obj->m_id) << endl;
 		if(it != markerMap.end()){
 			//camPose = it->second - CPose3D(obj->m_pose);
-			mrpt::math::CMatrixDouble44 hom;
-			mrpt::math::CArrayDouble<4> markerPoint;
-			mrpt::math::CArrayDouble<4> homog_point;
-			mrpt::math::CArrayDouble<3> point3D;
-
-			float testx=0;
-
-			markerPoint[0] = 0.123/2;
-			markerPoint[1] = 0.123/2;
-			markerPoint[2] = 0;
-			markerPoint[3] = 1;
-
-			it->second.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecX.push_back(point3D);
-			testx += point3D(0);
-
-			obj->m_pose.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecY.push_back(point3D);
-
-			markerPoint[0] = -0.123/2;
-			markerPoint[1] = 0.123/2;
-			markerPoint[2] = 0;
-			markerPoint[3] = 1;
-
-			it->second.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecX.push_back(point3D);
-			testx += point3D(0);
-
-			obj->m_pose.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecY.push_back(point3D);
-
-			markerPoint[0] = 0.123/2;
-			markerPoint[1] = -0.123/2;
-			markerPoint[2] = 0;
-			markerPoint[3] = 1;
-
-			it->second.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecX.push_back(point3D);
-			testx += point3D(0);
-
-			obj->m_pose.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecY.push_back(point3D);
-
-			markerPoint[0] = -0.123/2;
-			markerPoint[1] = -0.123/2;
-			markerPoint[2] = 0;
-			markerPoint[3] = 1;
-
-			it->second.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecX.push_back(point3D);
-			testx += point3D(0);
-
-			obj->m_pose.getHomogeneousMatrix(hom);
-			homog_point = hom*markerPoint;
-			point3D(0) = homog_point(0)/homog_point(3);
-			point3D(1) = homog_point(1)/homog_point(3);
-			point3D(2) = homog_point(2)/homog_point(3);
-			
-			vecY.push_back(point3D);
-			++n;
-			//cout << "Campose " << camPose << endl;
-			cout << "in map " << it->second << endl;
-			cout << testx/4 << endl;
-			//cout << camPose + CPose3D(obj->m_pose);
-			// CPose3D temp(obj->m_pose);
-			// temp.inverse();
-			// cout << CPose3D(obj->m_pose) + temp << endl;
-			//return true;
+			calcualte3DPoints(it->second, obj->m_size, vecX);
+			calcualte3DPoints(CPose3D(obj->m_pose), obj->m_size, vecY);
 		}
 	}
-	if(n>0){
+	if(vecX.size()>0){
 
+		//Calculate mean
 		for(int i = 0; i < vecY.size(); ++i){
 			mu_x(0) += vecX[i][0];
 			mu_x(1) += vecX[i][1];
@@ -212,12 +160,12 @@ bool getFramePose(const map<int, CPose3D> &markerMap, const vector_detectable_ob
 			mu_y(1) += vecY[i][1];
 			mu_y(2) += vecY[i][2];
 		}
+		mu_x /= vecX.size();
+		mu_y /= vecY.size();
 
-		mu_x /= (4*n);
-		mu_y /= (4*n);
+		//Calcualte covariance
 		Eigen::Vector3f del_y;
 		Eigen::Vector3f del_x;
-
 		for(int i = 0; i < vecY.size(); ++i){
 			del_y(0) = vecY[i](0);
 			del_y(1) = vecY[i](1);
@@ -227,35 +175,39 @@ bool getFramePose(const map<int, CPose3D> &markerMap, const vector_detectable_ob
 			del_x(2) = vecX[i](2);
 			covar += (del_y-mu_y)*((del_x-mu_x).transpose());
 		}
+		covar /= vecX.size();
+		// cout << "covar" << endl << covar << endl;
 
-		covar /= 4*n;
-		cout << "covar" << endl << covar << endl;
+		//Get the SVD of covariance
 		Eigen::JacobiSVD<Eigen::Matrix3f> svd(covar,Eigen::ComputeThinU | Eigen::ComputeThinV);
 		Eigen::Vector3f vs = svd.singularValues();
 		Eigen::Matrix3f D = Eigen::Matrix3f::Zero();
 		D(0,0)=vs[0];
 		D(1,1)=vs[1];
 		D(2,2)=vs[2];
-		cout << endl;
 		Eigen::Matrix3f S = Eigen::Matrix3f::Identity();
 		int uvt = round(svd.matrixU().determinant()*svd.matrixV().determinant());
-		cout << "uvt " << uvt << endl;
+		// cout << "uvt " << uvt << endl;
 		if(uvt == -1){
-			cout << "negative" << endl;
+			// cout << "negative" << endl;
 			S(2, 2) = -1;
 		}
+
+		//Calcualte Rotation matrix
 		Eigen::Matrix3f Rot = svd.matrixU()*S*svd.matrixV().transpose();
-		cout << "Rotation:" << endl << Rot << endl;
+		// cout << "Rotation:" << endl << Rot << endl;
 		cout << Rot.determinant() << endl;
+
+		//Calculate Translation vector
 		Eigen::Vector3f translation = mu_y - Rot*mu_x;
 		cout << "Trans:" << endl << translation << endl; 
-		//cout << (svd.matrixU() * D )* svd.matrixV().transpose();
-		//cout << "U:" << endl << svd.matrixU() << endl << "D:" << endl << D << endl << "Vt:" << endl << svd.matrixV() << endl;
-		// cout << svd.matrixU().determinant() << endl;
+
+		//Add translation vector to camPose
 		camPose.m_coords(0) = translation(0);
 		camPose.m_coords(1) = translation(1);
 		camPose.m_coords(2) = translation(2);
 
+		//Add rotation matrix to camPose
 		mrpt::math::CMatrixDouble33 rot;
 		for (int i = 0; i < 3; ++i)
 		{
@@ -264,8 +216,8 @@ bool getFramePose(const map<int, CPose3D> &markerMap, const vector_detectable_ob
 		}
 		camPose.setRotationMatrix(rot);
 		camPose.inverse();
-		cout << "new campose: " << endl << camPose << endl;
-		// camPose.setFromValues(camPose[0], camPose[1], camPose[2], camPose[3], camPose[4] - 1.5707963267948966, camPose[5]);
+
+		//cout << "new campose: " << endl << camPose << endl;
 		return true;
 	}
 	else
@@ -308,25 +260,21 @@ int main(int argc, char** argv){
 		vector_detectable_object detected;
 		det.detectObjects( obsImg, detected );
 
-		// COpenGLScene::Ptr &theScene = win.get3DSceneAndLock();
-
-		// {
-		// 	theScene->insert( opengl::stock_objects::CornerXYZ());
-		// }
-
-		//win.unlockAccess3DScene();
+		ASSERT_( IS_CLASS(detected[0],CDetectableMarker ) )
+		CDetectableMarker::Ptr obj = std::dynamic_pointer_cast<CDetectableMarker>(detected[0]);
+		float markerSize = obj->m_size;
 
 		if ( detected.size() > 0 )
 		{	
 			CPose3D camPose;
 			if(markerMap.empty())
 			{
-				addMarker(win, 0.123, detected, camPose, markerMap);
+				addMarker(win, markerSize, detected, camPose, markerMap);
 			}
 			else
 			{
 				if(getFramePose(markerMap, detected, camPose)){
-					addMarker(win, 0.123, detected, camPose, markerMap);
+					addMarker(win, markerSize, detected, camPose, markerMap);
 				}
 				else{
 					cout << "No common marker" << endl;
